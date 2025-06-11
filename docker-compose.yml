@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    image: analytics-api:v1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${LOCAL_PORT}:${PORT}"
+    command: uvicorn main:app --host 0.0.0.0 --port 8002 --reload
+    volumes:
+      - "./src:/code:rw"
+    develop:
+      watch:
+        - action: rebuild
+          path: Dockerfile
+        - action: rebuild
+          path: requirements.txt
+        - action: rebuild
+          path: docker-compose.yml
+        - action: sync
+          path: ./src
+          target: /code
+
+  # postgresql+psycopg://canonflow:canonflow@db_service:5432/timescaledb
+  db_service:
+    image: timescale/timescaledb:latest-pg17
+#    environment:
+#      - POSTGRES_USER=canonflow
+#      - POSTGRES_PASSWORD=canonflow
+#      - POSTGRES_DB=timescaledb
+    env_file:
+      - .env
+    ports:
+      - "${DB_LOCAL_PORT}:${DB_PORT}"
+    expose:
+      - "${DB_PORT}"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+
+volumes:
+  timescaledb_data:

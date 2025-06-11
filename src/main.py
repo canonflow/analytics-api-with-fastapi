@@ -23,9 +23,9 @@ app = FastAPI(lifespan=lifespan)
 # )
 app.include_router(event_router, prefix="/api/events")
 
-@app.on_event("startup")
-def on_startup():
-    print("Init method for db")
+# @app.on_event("startup")
+# def on_startup():
+#     print("Init method for db")
 
 @app.get("/")
 def read_root():
@@ -37,5 +37,5 @@ def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 
 @app.get("/healthz")
-def read_health():
-    return {"status": "OK"}
+def read_api_health():
+    return {"status": "ok"}
